@@ -1,0 +1,8 @@
+<form>
+    Select Type:&nbsp; 
+    {% for pizzoption in pizzoptions %}
+    <label class="radio-inline">
+      <input class="filter-checkbox" type="radio" name="optradio" product-id="{{pizzoption.pizza.id}}" value="{{pizzoption.id}}">{{pizzoption.type}}
+    </label>
+    {% endfor%}
+</form>

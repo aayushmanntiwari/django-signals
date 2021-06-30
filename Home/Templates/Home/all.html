@@ -1,0 +1,128 @@
+{% extends "Home/index.html" %}
+
+{% block allpizza %}
+<div class="container">
+    <div class="row">
+        {% for pizza in pizzas %}
+        <div class="col p-2">
+            <div class="card p-2" style="width: 18rem;">
+                <img class="card-img-top" src="{{pizza.image.url}}" alt="Card image cap">
+                <div class="card-body">
+                <h5 class="card-title">{{pizza.name}}</h5>
+                <p class="card-text">{{pizza.description | safe | truncatechars:11 }}</p>
+                    <!-- Button trigger modal -->
+                    <button type="button" class="custom-model btn btn-primary" data-toggle="modal" data-id="{{pizza.id}}" data-target="#exampleModalCenter_{{pizza.id}}">
+                        show details
+                    </button>
+                    <div class="modal fade" id="exampleModalCenter_{{pizza.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">{{pizza.name}}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            </div>
+                            <div id="modal-body-{{pizza.id}}" class="modal-body">
+                                <div id="loader" class="d-flex justify-content-center hide">
+                                    <div class="spinner-border" role="status">
+                                      <span class="sr-only">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+
+{% block allorders %}
+    <div>
+        <h3 class="text-center mb-4">All Orders</h3>
+        <div class="table-responsive font-size-md">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Order #</th>
+                        <th>Date Purchased</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                        <th>View</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td class="py-3"><a class="nav-link-style font-weight-medium font-size-sm" href="#order-details"
+                                data-toggle="modal">{{order.order_id}}</a></td>
+                        <td class="py-3">{{order.date}}</td>
+                        <td class="py-3"><span class="badge badge-info m-0">{{order.status}}</span></td>
+                        <td class="py-3">{{order.curr_total_amount}}</td>
+                        <td class="py-3">
+                            <a href="orders/showorder/{{order.id}}/" class="btn btn-danger btn-sm">View</a>
+                        </td>
+
+                    </tr>
+
+                    {%  endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+
+
+{% block script_pizza_options %}
+<script>
+    $(document).on('click','.custom-model',function(){
+        product_id = this.attributes[3].value
+        $.ajax({
+            url:'pizza/ajax/pizza-options/' + String(product_id),
+            data:product_id,
+            data_type:'html',
+            beforeSend:function(){
+                $('#modal-body-'+String(product_id)).html('');
+                $('#loader').removeClass("hide");
+            },
+            success:function(res) {
+                $('#modal-body-'+String(product_id)).html(res.rendered_table);
+                $('#loader').addClass("hide");
+            }
+        });
+    });
+
+</script>
+{% endblock %}
+
+
+{% block script_price_based_on_option %}
+<script>
+    $(document).on('click','.filter-checkbox',function(){
+        option_id = this.value;
+        product_id = this.attributes[3].value
+        $.ajax({
+            url:'pizza/ajax/pizza-option-selection-based-on-id/'+ String(option_id),
+            data:product_id,
+            data_type:'html',
+            beforeSend:function(){
+                $('#modal-body-'+String(product_id)).html('');
+                $('#loader').removeClass("hide");
+            },
+            success:function(res) {
+                $('#modal-body-'+String(product_id)).html(res.rendered_table);
+                $('#loader').addClass("hide");
+            }
+        });
+    });
+</script>
+{% endblock %}

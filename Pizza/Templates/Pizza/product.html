@@ -1,0 +1,306 @@
+	<!-- BREADCRUMB -->
+	<div id="breadcrumb">
+		<div class="container">
+			<ul class="breadcrumb">
+				<li><a href="/">Home</a></li>
+				<li><a >{{greatgrandparent_name}}</a></li>
+				<li><a >{{grandparent_name}}</a></li>
+				<li><a >{{parent_name}}</a></li>
+				<li class="active">{{child_name}}</li>
+				<li class="active">{{product_name}}</li>
+			</ul>
+		</div>
+	</div>
+	<!-- /BREADCRUMB -->
+
+	<!-- section -->
+	<div class="section">
+		<!-- container -->
+		<div class="container">
+			<!-- row -->
+			<div class="row">
+				<!--  Product Details -->
+				<div class="product product-details clearfix">
+					<div class="col-md-6">
+						<div id="product-main-view">
+							{% for image in images %}
+								{% if curr_varient.title == image.title %}
+									<div class="product-view">
+										<img src="{{image.image.url}}" alt="{{curr_varient.title}}">
+									</div>
+								{% endif %}
+							{% endfor %}
+						</div>
+						<div id="product-view">
+							{% for image in images %}
+								{% if curr_varient.title == image.title %}
+									<div class="product-view">
+										<img src="{{image.image.url}}" alt="{{curr_varient.title}}">
+									</div>
+								{% endif %}
+							{% endfor %}
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="product-body">
+							<div class="product-label">
+								{% if curr_product.is_product_new %}
+									<span>New</span>
+								{% endif %}
+								<span class="sale">{{curr_varient.discount}}%</span>
+							</div>
+							{% for size in sizes%}
+								{% if size.id == curr_varient.size_id %}
+									<h2 class="product-name">{{curr_varient.title}},{{size.name}}</h2>
+								{% endif %}
+							{% endfor %}
+							<h3 class="product-price">₹{{curr_varient.price}}<del class="product-old-price">₹{{curr_varient.orignal_price}}</del></h3>
+							<div>
+								<div class="product-rating">
+									<i class="fa fa-star"></i>
+									<i class="fa fa-star"></i>
+									<i class="fa fa-star"></i>
+									<i class="fa fa-star"></i>
+									<i class="fa fa-star-o empty"></i>
+								</div>
+								<a href="#">3 Review(s) / Add Review</a>
+							</div>
+							{% if curr_varient.availability %}
+								<p style="color: green;"><strong>Availability: </strong>In Stock</p>
+							{% else %}
+								<p style="color: red;"><strong>Availability: </strong>Out of Stock</p>
+							{% endif %}
+							<p><strong>Brand: </strong>{{curr_product.brand}}</p>
+							<p>{{curr_product.description| truncatechars:100 | safe}}</p>
+							<div class="product-options">
+								{% if curr_product.varient == "Size-Color" %}
+									<div class="size-option">
+										<form method="POST" id="post-form">
+											<input type="hidden" name="product_id" id="product_id" value="{{curr_varient.product_id}}">
+											{% csrf_token %}
+											{% if grandparent_name == "mobiles" and parent_name == "brands" %}
+												<span class="text-uppercase">Configuration:</span>
+											{% else %}
+												<span class="text-uppercase">Size:</span>
+											{% endif %}
+											<select  name="varient_size_id" id="varient_size_id">
+												<option disabled  value> -- select an option -- </option>
+												{% for current_varient_available_size in current_varient_available_sizes %}
+													{% for size in sizes %}
+														{% if current_varient_available_size.size_id == size.id  and current_varient_available_size.product_id == curr_varient.product_id  %}
+															<option {% if current_varient_available_size.size_id == curr_varient.size_id %} selected {% endif %}  value="{{current_varient_available_size.size_id}}">{{size.name}}</option>
+														{% endif %}
+													{% endfor %}
+												{% endfor %}
+											</select>
+										</form>
+									</div>
+
+
+									<form method="post"  id="post-color">
+										{% csrf_token %}
+										<div id="appendHere">
+											<ul class="color-option" >
+												<li><span class="text-uppercase">Color:</span></li>
+												{% for rs in current_varient_available_colors %}
+													<input type="radio"  {% if curr_varient.id == rs.id %} checked {% endif %} name="varient_id_1" id="varient_id_post_color_2" value="{{ rs.id }}" onchange="this.form.submit();">
+													<input type="hidden" name="varient_size_id_1" id="varient_size_id_post_color_2" value="{{ rs.size_id }}">
+													<input type="hidden" name="product_id_1" id="product_id_post_color_2" value="{{ rs.product_id }}">
+													{% for image in images %}
+														{% if image.id == rs.image_id %}
+															<li  {% if varient_id == rs.id %} class="active" {% endif %}>
+																<a style="background-color:; color: #D9D9D9; text-shadow: 1px 1px #000000; width: 90px">
+																</a>
+																<img src="{{image.image.url}}" style="height: 70px">
+															</li>
+														{% endif %}
+													{% endfor %}
+												{% endfor %}
+											</ul>
+										</div>
+									</form>
+
+
+								{% elif curr_product.varient == "Size" %}
+									<div class="size-option">
+										<form  method="POST">
+											<input type="hidden" name="product_id_1" id="product_id_size" value="{{curr_varient.product_id}}">
+											{% csrf_token %}
+											<span class="text-uppercase">Size:</span>
+											<ul class="color-option">
+												{% for current_varient_available_size in current_varient_available_sizes %}
+													{% for size in sizes %}
+														{% if current_varient_available_size.size_id == size.id and current_varient_available_size.product_id == curr_varient.product_id  %}
+															<input type="radio"  {% if curr_varient.id == current_varient_available_size.id %} checked {% endif %} name="varient_size_id_1" id="varient_size_id_size" value="{{current_varient_available_size.size_id}}" onchange="this.form.submit();">
+															<span class="text-uppercase">{{size.name}}</span>
+														{% endif %}
+													{% endfor %}
+												{% endfor %}
+											</ul>
+										</form>
+									</div>
+								{% endif %}
+							</div>
+
+							<div class="product-btns">
+									<input type="hidden" name="product_id" id="product_id" value="{{curr_varient.product_id}}">
+									<div class="qty-input">
+										{% if curr_varient.availability %}
+										<span class="text-uppercase">QTY: </span>
+										<input min="1" class="input" type="number" id="quantity" name="quantity">
+										{% endif %}
+									</div>
+									{% if curr_varient.availability and request.user.is_authenticated %}
+										<button class="primary-btn add-to-cart update-cart" data-check=True data-product={{curr_varient.id}} data-action='add'><i class="fa fa-shopping-cart"></i> Add to Cart</button>
+									{% elif curr_varient.availability %}
+										<button class="primary-btn add-to-cart update-cart" data-check=False ><i class="fa fa-shopping-cart"></i> Add to Cart</button>
+									{% endif %}
+								<div class="pull-right">
+									{% if request.user.is_authenticated %}
+										<button type="button" {% if wishlist.varient_id == curr_varient.id  and wishlist is not None  and wishlist.user_id == request.user.id%} style="box-shadow: 0px 0px 0px 1px #f8694a inset, 0px 0px 0px 0px #f8694a; color: #F8694A;" {% endif %} class="main-btn icon-btn add-to-wishlist" data-check=True data-product={{curr_varient.id}} data-action='addtolist'><i class="fa fa-heart"></i></button>
+									{% else %}
+										<button type="button" class="main-btn icon-btn add-to-wishlist" data-check=False data-product={{curr_varient.id}} data-action='addtolist'><i class="fa fa-heart"></i></button>
+									{% endif %}
+									<button class="main-btn icon-btn"><i class="fa fa-exchange"></i></button>
+									<button class="main-btn icon-btn"><i class="fa fa-share-alt"></i></button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="product-tab">
+							<ul class="tab-nav">
+								<li class="active"><a data-toggle="tab" href="#tab1">Description</a></li>
+								<li><a data-toggle="tab" href="#tab3">Details</a></li>
+								<li><a data-toggle="tab" href="#tab2">Reviews (3)</a></li>
+							</ul>
+							<div class="tab-content">
+								<div id="tab1" class="tab-pane fade in active">
+									<p>{{curr_product.description | safe }}</p>
+								</div>
+
+								<div id="tab3" class="tab-pane fade in">
+									{% if parent_name == "topwear" or parent_name == "Top wear" %}
+										{% include 'topwear-table.html' %}
+									{% endif %}
+
+									{% if parent_name == "bottomwear" %}
+										{% include 'bottom-wear.html' %}
+									{% endif %}
+
+									{% if parent_name == "brands" and grandparent_name == "mobiles" %}
+										{% include 'mobile-table.html' %}
+									{% endif %}
+								</div>
+
+								<div id="tab2" class="tab-pane fade in">
+
+									<div class="row">
+										<div class="col-md-6">
+											<div class="product-reviews">
+												<div class="single-review">
+													<div class="review-heading">
+														<div><a href="#"><i class="fa fa-user-o"></i> John</a></div>
+														<div><a href="#"><i class="fa fa-clock-o"></i> 27 DEC 2017 / 8:0 PM</a></div>
+														<div class="review-rating pull-right">
+															<i class="fa fa-star"></i>
+															<i class="fa fa-star"></i>
+															<i class="fa fa-star"></i>
+															<i class="fa fa-star"></i>
+															<i class="fa fa-star-o empty"></i>
+														</div>
+													</div>
+													<div class="review-body">
+														<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.Duis aute
+															irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+													</div>
+												</div>
+
+												<div class="single-review">
+													<div class="review-heading">
+														<div><a href="#"><i class="fa fa-user-o"></i> John</a></div>
+														<div><a href="#"><i class="fa fa-clock-o"></i> 27 DEC 2017 / 8:0 PM</a></div>
+														<div class="review-rating pull-right">
+															<i class="fa fa-star"></i>
+															<i class="fa fa-star"></i>
+															<i class="fa fa-star"></i>
+															<i class="fa fa-star"></i>
+															<i class="fa fa-star-o empty"></i>
+														</div>
+													</div>
+													<div class="review-body">
+														<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.Duis aute
+															irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+													</div>
+												</div>
+
+												<div class="single-review">
+													<div class="review-heading">
+														<div><a href="#"><i class="fa fa-user-o"></i> John</a></div>
+														<div><a href="#"><i class="fa fa-clock-o"></i> 27 DEC 2017 / 8:0 PM</a></div>
+														<div class="review-rating pull-right">
+															<i class="fa fa-star"></i>
+															<i class="fa fa-star"></i>
+															<i class="fa fa-star"></i>
+															<i class="fa fa-star"></i>
+															<i class="fa fa-star-o empty"></i>
+														</div>
+													</div>
+													<div class="review-body">
+														<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.Duis aute
+															irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+													</div>
+												</div>
+
+												<ul class="reviews-pages">
+													<li class="active">1</li>
+													<li><a href="#">2</a></li>
+													<li><a href="#">3</a></li>
+													<li><a href="#"><i class="fa fa-caret-right"></i></a></li>
+												</ul>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<h4 class="text-uppercase">Write Your Review</h4>
+											<p>Your email address will not be published.</p>
+											<form class="review-form">
+												<div class="form-group">
+													<input class="input" type="text" placeholder="Your Name" />
+												</div>
+												<div class="form-group">
+													<input class="input" type="email" placeholder="Email Address" />
+												</div>
+												<div class="form-group">
+													<textarea class="input" placeholder="Your review"></textarea>
+												</div>
+												<div class="form-group">
+													<div class="input-rating">
+														<strong class="text-uppercase">Your Rating: </strong>
+														<div class="stars">
+															<input type="radio" id="star5" name="rating" value="5" /><label for="star5"></label>
+															<input type="radio" id="star4" name="rating" value="4" /><label for="star4"></label>
+															<input type="radio" id="star3" name="rating" value="3" /><label for="star3"></label>
+															<input type="radio" id="star2" name="rating" value="2" /><label for="star2"></label>
+															<input type="radio" id="star1" name="rating" value="1" /><label for="star1"></label>
+														</div>
+													</div>
+												</div>
+												<button class="primary-btn">Submit</button>
+											</form>
+										</div>
+									</div>
+
+
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /Product Details -->
+			</div>
+			<!-- /row -->
+		</div>
+		<!-- /container -->
+	</div>
+	<!-- /section -->

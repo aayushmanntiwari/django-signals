@@ -1,0 +1,22 @@
+<form method="POST" action="{% url 'create_order' %}">
+    Select Type:&nbsp; 
+    {% for pizzoption in pizzoptions %}
+    <label class="radio-inline">
+      <input class="filter-checkbox" {% if option_id == pizzoption.id %}checked{% endif %} type="radio" name="optradio" product-id="{{pizzoption.pizza.id}}" value="{{pizzoption.id}}">{{pizzoption.type}}
+    </label>
+    {% endfor%}
+    <div class="d-flex align-items-center justify-content-between">
+      <input type="hidden" name="size" value="{{pizzoption.id}}">
+      <input type="hidden" name="product_id" value="{{pizzoption.pizza.id}}">
+      <input type="hidden" name="amount" value="{{pizzoption.amount}}">
+      <div class="product-price"><span class="text-accent"> ₹ {{pizzoption.amount}}</span></div>
+      {% if pizzoption.status == 'available' %}
+        <div class="qty-input">
+          
+          <span class="text-uppercase">QTY: </span>
+          <input min="1" max="2" class="input" type="number" id="quantity" name="quantity">
+        </div>
+        <button class="btn btn-primary btn-sm"  type="submit" data-toggle="toast" data-target="#cart-toast">+<i class="czi-cart font-size-base ml-1"></i></button>
+      {% endif %}
+    </div>
+</form>
